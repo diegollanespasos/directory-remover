@@ -2,8 +2,24 @@ const fs = require('fs');
 const readline = require('readline');
 const directoryToDelete = process.argv[2];
 
-var numDirectories = 1;
-var numFiles = 0;
+let numDirectories = 1;
+let numFiles = 0;
+
+fs.readdir(directoryToDelete, (error, files) => {
+  if (error) {
+    console.log('This directory does not exist');
+  } else {
+    isDirectoryEmpty(files);    
+  }
+});
+
+function isDirectoryEmpty(files) {
+  if (files.length === 0)  {
+    removeDirectory();
+   } else {
+    askUserToRemove();
+   }
+}
 
 function removeDirectory(){
   fs.rm(directoryToDelete, {
@@ -28,32 +44,16 @@ function askUserToRemove(){
   });
 }
 
-function isDirectoryEmpty(files) {
-  if (files.length === 0)  {
-    removeDirectory();
-   } else {
-    askUserToRemove();
-   }
-}
-
 function countDirectoriesAndFiles(filePath) {
   fs.readdir(filePath, (err, files) => {
       files.forEach(file => {
           const isDirectory = fs.statSync(`${filePath}/${file}`).isDirectory();
           if(isDirectory){
-            numDirectories +=1;
+            numDirectories++;
             countDirectoriesAndFiles(`${filePath}/${file}`);
           } else {
-            numFiles +=1;
+            numFiles++;
           }
       })
   })
 }
-
-fs.readdir(directoryToDelete, (error, files) => {
-  if (error) {
-    console.log('This directory does not exist');
-  } else {
-    isDirectoryEmpty(files);    
-  }
-});
